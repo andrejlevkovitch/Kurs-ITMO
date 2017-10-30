@@ -1,0 +1,19 @@
+Swap elements at indices 1 and 20.
+Swap elements at indices 2 and 4.
+Swap elements at indices 3 and 10.
+Swap elements at indices 4 and 20.
+Swap elements at indices 5 and 9.
+Swap elements at indices 6 and 11.
+Swap elements at indices 7 and 13.
+Swap elements at indices 8 and 12.
+Swap elements at indices 9 and 12.
+Swap elements at indices 10 and 13.
+Swap elements at indices 13 and 14.
+Swap elements at indices 14 and 15.
+Swap elements at indices 15 and 16.
+Swap elements at indices 16 and 17.
+Swap elements at indices 17 and 18.
+Swap elements at indices 18 and 19.
+Swap elements at indices 19 and 20.
+No more swaps needed.
+3 8 911 1101 1225 1364 1410 1444 1771 1793 1795 1908 1939 1940 1945 1978 2004 2014 2800 3547 

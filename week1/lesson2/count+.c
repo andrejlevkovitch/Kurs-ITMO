@@ -7,7 +7,7 @@ int main (void)
 {
     FILE *inFile;
     int digit1 = 0, digit2 = 0;
-    int rezult = 0;
+    long long rezult = 0;//по ходу используется устаревший компилятор - приходится использовать ти long long вмето просто long
 
     if ((inFile = fopen ("input.txt", "r")) == NULL) {
         printf ("ERROR of open input.txt\n");
@@ -26,7 +26,7 @@ int main (void)
         exit (EXIT_FAILURE);
     }
 
-    rezult = digit1 + digit2 * digit2;
+    rezult = digit1 + (long long) digit2 * digit2;
 
     FILE *outFile;
 
@@ -35,7 +35,7 @@ int main (void)
         exit (EXIT_FAILURE);
     }
 
-    fprintf (outFile, "%i", rezult);
+    fprintf (outFile, "%lli", rezult);
 
     if (fclose (outFile) != 0) {
         printf ("Error of exit outfile.txt\n");

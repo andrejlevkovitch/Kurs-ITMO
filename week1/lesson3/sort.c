@@ -75,10 +75,10 @@ int main (void)
         exit (EXIT_FAILURE);
     }
 
-    free (masElements);
-    *masElements = 0;
-    free (masIndex);
-    *masIndex = 0;
+//    free (masElements);
+//    *masElements = 0;
+//    free (masIndex);
+//    *masIndex = 0;
 
     return EXIT_SUCCESS;
 }

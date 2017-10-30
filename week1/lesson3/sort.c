@@ -55,7 +55,7 @@ int main (void)
         }
     }
 
-    if ((outFile = fopen ("output.txt", "w+")) == NULL) {
+    if ((outFile = fopen ("output.txt", "w")) == NULL) {
         printf ("ERROR of open file output.txt\n");
         exit (EXIT_FAILURE);
     }

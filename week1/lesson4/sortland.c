@@ -20,8 +20,8 @@ int main (void)
 
     fscanf (inFile, "%hu", &nIdent);
 
-    float *masElements = malloc (nIdent * sizeof (float));
-    unsigned short *masIdent = malloc (nIdent * sizeof (unsigned short));
+    float *masElements = malloc (nIdent * sizeof *masElements);
+    unsigned short *masIdent = malloc (nIdent * sizeof *masIdent);
 
     for (unsigned int i = 0; i < nIdent; ++i) {
         fscanf (inFile, "%f", &masElements [i]); 

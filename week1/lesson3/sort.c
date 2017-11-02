@@ -22,8 +22,8 @@ int main (void)
         exit (EXIT_FAILURE);
     }
 
-    int *masElements = malloc (nElements * sizeof (int));
-    int *masIndex = malloc (nElements * sizeof (int));
+    int *masElements = malloc (nElements * sizeof *masElements);
+    int *masIndex = malloc (nElements * sizeof *masIndex);
 
     for (unsigned int i = 0; i < nElements; ++i) {
         fscanf (inFile, "%i", &masElements [i]);

@@ -18,7 +18,7 @@ int main (void)
     
     fscanf (inFile, "%hu", &nElements);
 
-    int *masElements = malloc (nElements * sizeof (int));
+    int *masElements = malloc (nElements * sizeof *masElements);
 
     for (unsigned int i = 0; i < nElements; ++i) {
         fscanf (inFile, "%i", &masElements [i]);

@@ -1,9 +1,9 @@
-//merger.c
+//inversion.c
 
 #include <stdio.h>
 #include <stdlib.h>
 
-void merge (FILE *output, int mas [], int left, int midle, int right)
+void merge (long long *cin, int mas [], int left, int midle, int right)
 {
     int counterL = 0;
     int counterR = 0;
@@ -26,6 +26,7 @@ void merge (FILE *output, int mas [], int left, int midle, int right)
         if (masL [counterL] > masR [counterR]) {
             mas [num] = masR [counterR];
             ++counterR;
+            *cin += n1 - counterL;
         }
         else {
             mas [num] = masL [counterL];
@@ -46,24 +47,22 @@ void merge (FILE *output, int mas [], int left, int midle, int right)
         }
     }
 
-    fprintf (output, "%i %i %i %i\n", left + 1, right + 1, mas [left], mas [right]);
-
 //    free (masL);
 //    *masL = 0;
 //    free (masR);
 //    *masR = 0;
 }
 
-void mergeSort (FILE *output, int mas [], int left, int right)
+void mergeSort (long long *cin, int mas [], int left, int right)
 {
     int midle = 0;
 
     if (left < right) {
         midle = left + (right - left) / 2;
-        mergeSort (output, mas, left, midle);
-        mergeSort (output, mas, midle + 1, right);
+        mergeSort (cin, mas, left, midle);
+        mergeSort (cin, mas, midle + 1, right);
 
-        merge (output, mas, left, midle, right);
+        merge (cin, mas, left, midle, right);
     }
 }
 
@@ -72,6 +71,8 @@ int main (void)
     FILE *input;
     FILE *output;
     int nElements = 0;
+    long long counterOfInvers = 0;
+    long long *cin = &counterOfInvers;
 
     if ((input = fopen ("input.txt", "r")) == NULL) {
         printf ("ERROR of open file input.txt\n");
@@ -96,11 +97,9 @@ int main (void)
         exit (EXIT_FAILURE);
     }
 
-    mergeSort (output, masElements, 0, nElements - 1);
+    mergeSort (cin, masElements, 0, nElements - 1);
 
-    for (unsigned int i = 0; i < nElements; ++i) {
-        fprintf (output, "%i ", masElements [i]);
-    }
+    fprintf (output, "%lli", counterOfInvers);
 
     if (fclose (output) != 0) {
         printf ("ERROR of exit from file output.txt\n");

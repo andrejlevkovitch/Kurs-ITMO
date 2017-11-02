@@ -14,8 +14,6 @@ void merge (FILE *output, int mas [], int left, int midle, int right)
     int *masL = malloc (n1 * sizeof (int));
     int *masR = malloc (n2 * sizeof (int));
 
-    fprintf (output, "%i %i %i %i\n", left + 1, right + 1, mas [left], mas [right]);
-
     for (unsigned int i = 0; i < n1; ++i) {
         masL [i] = mas [left + i]; 
     }
@@ -47,6 +45,8 @@ void merge (FILE *output, int mas [], int left, int midle, int right)
             mas [num + i] = masL [i + counterL];
         }
     }
+
+    fprintf (output, "%i %i %i %i\n", left + 1, right + 1, mas [left], mas [right]);
 
 //    free (masL);
 //    *masL = 0;

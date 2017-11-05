@@ -20,7 +20,7 @@ andrejlevkovitch@gmail.com
         task2
             ready for C
         task3
-            
+            ready for C
         task4
             ready for C
         task5

@@ -7,20 +7,35 @@ void generation (int masElements [], int anti [], int first, int last, int *kurr
 {
     int left = first;
     int right = last;
-    int midle = (left + 1 + right + 1) / 2 - 1;
+    int midle = (left + right) / 2;
+    if (right - left == 1) {
+        ++midle;
+    }
     int temp = 0;
 
     if (masElements [midle] == 1) {
-        midle = masElements [midle] = *kurrent;
+        masElements [midle] = *kurrent;
         --*kurrent;
     }
 
+    temp = masElements [midle];
+    masElements [midle] = masElements [right];
+    masElements [right] = temp;
+
+    temp = anti [midle];
+    anti [midle] = anti [right];
+    anti [right] = temp;
+
+    left = right;
+    --right;
+
+/*    left = midle;
     while (left <= right) {
-        while (masElements [left] < midle) {
+        while (masElements [left] < *kurrent) {
             ++left;
         }
 
-        while (masElements [right] > midle) {
+        while (masElements [right] > *kurrent) {
             --right;
         }
 
@@ -36,7 +51,7 @@ void generation (int masElements [], int anti [], int first, int last, int *kurr
             ++left;
             --right;
         }
-    }
+    }*/
 
     if (first < right) {
         generation (masElements, anti, first, right, kurrent);
@@ -78,13 +93,13 @@ int main (void)
     int *anti = malloc (size * sizeof (*anti));
 
     for (unsigned int i = 0; i < size; ++i) {
-        anti [i] = size - 1 - i;
+        anti [i] = i;
     }
 
     generation (masElements, anti, 0, size - 1, kurrent);
 
     for (unsigned int i = 0; i < size; ++i) {
-        rezult [i] = masElements [anti [i]];
+        rezult [anti [i]] = masElements [i];
     }
 
     if ((output = fopen ("output.txt", "w")) == NULL) {

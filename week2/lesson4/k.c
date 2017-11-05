@@ -1,9 +1,9 @@
-//quicksort.c
+//k.c
 
 #include <stdio.h>
 #include <stdlib.h>
 
-void qusort (int masElements [], int first, int last)
+void qusort (int masElements [], int first, int last, int k1, int k2)
 {
     int left = first;
     int right = last;
@@ -11,7 +11,6 @@ void qusort (int masElements [], int first, int last)
     int temp = 0;
 
     while (left <= right) {
-        printf ("++1\n");
         while (masElements [left] < midle) {
             ++left;
         }
@@ -21,7 +20,6 @@ void qusort (int masElements [], int first, int last)
         }
 
         if (left <= right) {
-            printf ("++1\n");
             temp = masElements [left];
             masElements [left] = masElements [right];
             masElements [right] = temp;
@@ -30,14 +28,12 @@ void qusort (int masElements [], int first, int last)
         }
     }
 
-    if (first < right) {
-        printf ("++1\n");
-        qusort (masElements, first, right);
+    if (first < right && right >= k1) {
+        qusort (masElements, first, right, k1, k2);
     }
 
-    if (last > left) {
-        printf ("++1\n");
-        qusort (masElements, left, last);
+    if (last > left && left <= k2) {
+        qusort (masElements, left, last, k1, k2);
     }
 }
 
@@ -46,36 +42,40 @@ int main (void)
     FILE *input;
     FILE *output;
     int size = 0;
+    int k1 = 0, k2 = 0;
+    int A = 0, B = 0, C = 0;
 
     if ((input = fopen ("input.txt", "r")) == NULL) {
         printf ("ERROR of open file input.txt\n");
         exit (EXIT_FAILURE);
     }
-
-    fscanf (input, "%i", &size);
-
-    int *masElements = malloc (size * sizeof (*masElements));
-
-    for (unsigned int i = 0; i < size; ++i) {
-        fscanf (input, "%i", &masElements [i]);
-    }
     
+    fscanf (input, "%i %i %i", &size, &k1, &k2);
+
+    int *array = malloc (size * sizeof (*array));
+
+    fscanf (input, "%i %i %i %i %i", &A, &B, &C, &array [0], &array [1]);
+
     if (fclose (input) != 0) {
         printf ("ERROR of exit from file input.txt\n");
         exit (EXIT_FAILURE);
     }
 
-    qusort (masElements, 0, size - 1);
+    for (unsigned int i = 2; i < size; ++i) {
+        array [i] = A * array [i - 2] + B * array [i - 1] + C;
+    }
+
+    qusort (array, 0, size - 1, k1 - 1, k2 - 1);
 
     if ((output = fopen ("output.txt", "w")) == NULL) {
         printf ("ERROR of open file output.txt\n");
         exit (EXIT_FAILURE);
     }
-    
-    for (unsigned int i = 0; i < size; ++i) {
-        fprintf (output, "%i ", masElements [i]);
-    }
 
+    for (unsigned int i = k1 - 1; i < k2; ++i) {
+        fprintf (output, "%i ", array [i]);
+    }
+    
     if (fclose (output) != 0) {
         printf ("ERROR of exit from file output.txt\n");
         exit (EXIT_FAILURE);

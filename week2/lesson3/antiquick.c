@@ -7,7 +7,7 @@ void generation (int masElements [], int anti [], int first, int last, int *kurr
 {
     int left = first;
     int right = last;
-    int midle = (left + right) / 2;
+    int midle = (left + 1 + right + 1) / 2 - 1;
     int temp = 0;
 
     if (masElements [midle] == 1) {
@@ -92,14 +92,9 @@ int main (void)
         exit (EXIT_FAILURE);
     }
 
-//    if (size == 4) {
-  //      fprintf (output, "3 4 1 2");
- //   }
-//    else {
     for (unsigned int i = 0; i < size; ++i) {
         fprintf (output, "%i ", rezult [i]);
     }
-//    }
     
     if (fclose (output) != 0) {
         printf ("ERROR of exit from file output.txt\n");

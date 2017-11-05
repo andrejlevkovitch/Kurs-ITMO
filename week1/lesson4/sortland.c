@@ -64,10 +64,5 @@ int main (void)
         exit (EXIT_FAILURE);
     }
 
-//    free (masElements);
-//    *masElements = 0;
-//    free (masIdent);
-//    *masIdent = 0;
-
     return EXIT_SUCCESS;
 }

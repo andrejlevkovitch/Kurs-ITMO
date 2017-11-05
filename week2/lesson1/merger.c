@@ -47,11 +47,6 @@ void merge (FILE *output, int mas [], int left, int midle, int right)
     }
 
     fprintf (output, "%i %i %i %i\n", left + 1, right + 1, mas [left], mas [right]);
-
-//    free (masL);
-//    *masL = 0;
-//    free (masR);
-//    *masR = 0;
 }
 
 void mergeSort (FILE *output, int mas [], int left, int right)
@@ -106,9 +101,6 @@ int main (void)
         printf ("ERROR of exit from file output.txt\n");
         exit (EXIT_FAILURE);
     }
-
-//    free (masElements);
-//    *masElements = 0;
 
     return EXIT_SUCCESS;
 }

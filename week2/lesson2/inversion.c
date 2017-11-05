@@ -46,11 +46,6 @@ void merge (long long *cin, int mas [], int left, int midle, int right)
             mas [num + i] = masL [i + counterL];
         }
     }
-
-//    free (masL);
-//    *masL = 0;
-//    free (masR);
-//    *masR = 0;
 }
 
 void mergeSort (long long *cin, int mas [], int left, int right)
@@ -105,9 +100,6 @@ int main (void)
         printf ("ERROR of exit from file output.txt\n");
         exit (EXIT_FAILURE);
     }
-
-//    free (masElements);
-//    *masElements = 0;
 
     return EXIT_SUCCESS;
 }

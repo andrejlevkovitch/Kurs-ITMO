@@ -29,11 +29,6 @@ int main (void)
 
     charArray = malloc (nArr * size * sizeof *charArray);
 
-/*    for (unsigned int i = 0; i < size; ++i) {//не знаю почему, но при такой форме записи наблюдаются вылеты при nArr = 20, size = 10
-        fscanf (input, "%s", &charArray [i * nArr]);
-    }
-*/
-
     num = 0;
     while ((temp = getc (input)) != EOF) {
         if (temp != '\n') {

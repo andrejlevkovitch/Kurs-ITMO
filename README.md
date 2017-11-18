@@ -32,7 +32,7 @@ andrejlevkovitch@gmail.com
             ready for C
     week4
         task1
-            
+            ready for C
         task2
             
         task3

@@ -40,9 +40,9 @@ andrejlevkovitch@gmail.com
         task4
             in progress
         task5
-            
+            no idea
         task6
-            
+            ready for C
     week5
         task1
             

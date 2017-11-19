@@ -16,3 +16,6 @@ gen
 gen.c
 ssort
 stack
+bracket
+search
+enq

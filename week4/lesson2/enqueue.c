@@ -1,4 +1,4 @@
-//stack.c
+//enqueue.c
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,10 +9,11 @@ int main (void)
 {
     FILE *input;
     FILE *output;
-    int *stack = NULL;
+    int *enq= NULL;
     int nOrders;
     int size = 0;
-    int top = 0;
+    int tail = 0;
+    int head = 0;
     char operacia = 0;
 
     if ((input = fopen ("input.txt", "r")) == NULL) {
@@ -27,7 +28,7 @@ int main (void)
     else
         size = nOrders;
 
-    stack = malloc (size * sizeof *stack);
+    enq = malloc (size * sizeof *enq);
 
     if ((output = fopen ("output.txt", "w")) == NULL) {
         printf ("ERROR of open file output.txt\n");
@@ -38,13 +39,14 @@ int main (void)
         getc (input);
         fscanf (input, "%c", &operacia);
         if (operacia == '+') {
-            fscanf (input, "%i", &stack [top]);
-            top++;
-            top = (top == maxSize) ? 0: top;
+            fscanf (input, "%i", &enq [tail]);
+            tail++;
+            tail = (tail == maxSize) ? 0: tail;
         }
         else {
-            top--;
-            fprintf (output, "%i\n", stack [top]);
+            fprintf (output, "%i\n", enq [head]);
+            head++;
+            head = (head == maxSize) ? 0: head;
         }
     }
 

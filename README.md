@@ -34,11 +34,11 @@ andrejlevkovitch@gmail.com
         task1
             ready for C
         task2
-            
+            ready for C
         task3
-            
+            ready for C
         task4
-            
+            in progress
         task5
             
         task6

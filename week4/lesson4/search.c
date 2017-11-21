@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <limits.h>
+#include <stdbool.h>
 
 int main (void)
 {
@@ -12,8 +13,7 @@ int main (void)
     int nOperace = 0;
     int size = 0;
     int head = 0, tail = 0;
-    int minElement = 0;
-    int koordME = -1;
+    bool egan = true;
 
     if ((input = fopen ("input.txt", "r")) == NULL) {
         printf ("ERROR of open file input.txt\n");
@@ -36,26 +36,21 @@ int main (void)
         switch (getc (input)) {
             case '+':
                 fscanf (input, "%i", &enq [tail]);
-                if (minElement > enq [tail]) {
-                    minElement = enq [tail];
-                    koordME = tail;
-                }
                 tail++;
+                egan = true;
                 break;
             case '-':
                 head++;
                 break;
             case '?':
-                if (koordME < head || koordME < 0) {
-                    minElement = INT_MAX;
-                    for (signed int j = head; j < tail; ++j) {
-                        if (minElement > enq [j]) {
-                            minElement = enq [j];
-                            koordME = j;
-                        }
+                if (egan) {
+                    for (signed int i = tail - 1; i >= head; --i) {
+                        if (enq [i] < enq [i - 1])
+                            enq [i - 1] = enq [i];
                     }
+                    egan = false;
                 }
-                fprintf (output, "%i\n", minElement);
+                fprintf (output, "%i\n", enq [head]);
                 break;
         }
     }

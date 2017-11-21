@@ -38,7 +38,7 @@ andrejlevkovitch@gmail.com
         task3
             ready for C
         task4
-            in progress
+            ready for C
         task5
             no idea
         task6

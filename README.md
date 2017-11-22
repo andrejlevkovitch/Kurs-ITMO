@@ -45,7 +45,7 @@ andrejlevkovitch@gmail.com
             ready for C
     week5
         task1
-            
+            ready for C
         task2
             
     week6

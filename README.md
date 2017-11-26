@@ -50,7 +50,7 @@ andrejlevkovitch@gmail.com
             ready for C
     week6
         task1
-            
+            ready for C
         task2
             
         task3

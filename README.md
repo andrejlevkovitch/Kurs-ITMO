@@ -52,13 +52,13 @@ andrejlevkovitch@gmail.com
         task1
             ready for C
         task2
-            in progress
+            ready for C
         task3
             ready for C
         task4
-            
+            ready for C
         task5
-            
+            in progres
     week7
         task1
             

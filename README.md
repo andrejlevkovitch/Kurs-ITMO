@@ -61,7 +61,7 @@ andrejlevkovitch@gmail.com
             in progres
     week7
         task1
-            
+            ready for C
         task2
             
         task3

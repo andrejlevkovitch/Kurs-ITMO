@@ -63,7 +63,7 @@ andrejlevkovitch@gmail.com
         task1
             ready for C
         task2
-            
+            ready for C
         task3
             
         task4

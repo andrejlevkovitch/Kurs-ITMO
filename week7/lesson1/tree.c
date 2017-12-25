@@ -22,6 +22,7 @@ void rm (struct node *);
 struct node *serch (struct node *, int);
 int hight_a (int (*array)[COLUMNS], int el);
 int highting (struct node *);
+void del (struct tree *rm_tree, int element);
 
 int main (void)
 {
@@ -29,8 +30,8 @@ int main (void)
     FILE *output = NULL;
 
     int size = 0;
-//    struct tree *bt = init_tree ();
-//    struct node *hNode = NULL;
+    struct tree *bt = init_tree ();
+    struct node *hNode = NULL;
 
     int h = 0;
 
@@ -52,21 +53,22 @@ int main (void)
         exit (EXIT_FAILURE);
     }
 
-//    if (size) {
-//        build (&bt->root, 0, array);
-//        highting (bt->root);
-//    }
+    if (size) {
+        build (&bt->root, 0, array);
+        highting (bt->root);
+    }
 
     if ((output = fopen ("output.txt", "w")) == NULL) {
         printf ("ERROR of open file output.txt\n");
         exit (EXIT_FAILURE);
     }
 
-    hight_a (array, 1);
+//    hight_a (array, 1);
     for (int i = 0; i < size; ++i) {
-//        hNode = serch (bt->root, array [i][0]);
-//        h = hNode->h;
-        h = array [i][3];
+        hNode = serch (bt->root, array [i][0]);
+        h = hNode->h;
+        del (bt, hNode->value);
+//        h = array [i][3];
         fprintf (output, "%i\n", h);
     }
 
@@ -75,10 +77,8 @@ int main (void)
         exit (EXIT_FAILURE);
     }
 
-//    rm (bt->root);
-//    bt->root = NULL;
-//    free (bt);
-//    bt = NULL;
+    free (bt);
+    bt = NULL;
 
     return EXIT_SUCCESS;
 }
@@ -172,4 +172,57 @@ int hight_a (int (*array)[COLUMNS], int el)
         return n;
     else
         return k;
+}
+
+void del (struct tree *rm_tree, int element)
+{
+    struct node *rm_node = rm_tree->root;
+    struct node **q = &rm_tree->root;//для изменения адреса в узле
+
+    for (;;) {//поиск удаляемого элемента
+        if (!rm_node)
+            return;
+        else
+            if (rm_node->value == element)
+                break;
+            else
+                if (rm_node->value > element) {
+                    q = &rm_node->left;
+                    rm_node = rm_node->left;
+                }
+                else {
+                    q = &rm_node->right;
+                    rm_node = rm_node->right;
+                }
+    }
+
+    //удаление элемента
+    if (!rm_node->right)//если правая ветка пуста
+        *q = rm_node->left;
+    else {
+        struct node *y = rm_node->right;//подветка основной ветки
+        
+        if (!y->left) {//если левая подветка пуста
+            y->left = rm_node->left;//то левая ветка переносится в левую подветку
+            *q = y;//а узел правого потомка смещается на место родителя
+        }
+        else {//если левая подветка заполнена
+            struct node *x = y->left;//под-подветка левой подветки
+
+            while (x->left) {//находится самый маленький элемент
+                y = x;
+                x = y->left;
+            }
+
+            y->left = x->right;//подветка принимает правого (единственного) ребенка себе
+            x->left = rm_node->left;//а найденный минимальный элемент становится на место удаленного
+            x->right = rm_node->right;
+            *q = x;
+        }
+    }
+
+    free (rm_node);//это значение больше нигде не используется, так что освобождаем его
+    rm_node = NULL;
+
+    return;
 }

@@ -9,7 +9,6 @@ struct node {
     struct node *left;
     struct node *right;
     int value;
-    int hight;
     int balance;
 };
 
@@ -98,7 +97,6 @@ void build (struct node **inNode, int n, int (*array)[COLUMNS])
     (*inNode)->value = array [n][0];
     (*inNode)->left = NULL;
     (*inNode)->right = NULL;
-    (*inNode)->hight = 0;
     (*inNode)->balance = 0;
 
     if (array [n][1]) {
@@ -185,7 +183,6 @@ int highting (struct node *hNode)
         k = highting (hNode->right) + 1;
         n = highting (hNode->left) + 1;
 
-        hNode->hight = (n > k) ? n: k;
         hNode->balance = n - k;
     }
 
@@ -203,13 +200,11 @@ void turn (struct node **tNode)
     struct node *beta = NULL;
     struct node *hama = NULL;
 
-    int l = 0, r = 0;
-
     B = *tNode;
 
     switch ((*tNode)->balance) {
         case -2:
-            switch ((*tNode)->right->balance) {
+            switch (B->right->balance) {
                 case -1: case 0:
                     A = B->right;
                     hama = A->left;
@@ -217,6 +212,16 @@ void turn (struct node **tNode)
                     B->right = hama;
                     *tNode = A;
 
+                    switch (A->balance) {
+                        case -1:
+                            B->balance = 0;
+                            A->balance = 0;
+                            break;
+                        case 0:
+                            B->balance = -1;
+                            A->balance = 1;
+                            break;
+                    }
                     break;
                 case 1:
                     A = B->right;
@@ -229,6 +234,23 @@ void turn (struct node **tNode)
                     B->right = beta;
                     *tNode = C;
 
+                    switch (C->balance) {
+                        case -1:
+                            B->balance = 1;
+                            A->balance = 0;
+                            C->balance = 0;
+                            break;
+                        case 0:
+                            B->balance = 0;
+                            A->balance = 0;
+                            C->balance = 0;
+                            break;
+                        case 1:
+                            B->balance = 0;
+                            A->balance = -1;
+                            C->balance = 0;
+                            break;
+                    }
                     break;
                 default:
                     break;
@@ -236,7 +258,7 @@ void turn (struct node **tNode)
 
             break;
         case 2:
-            switch ((*tNode)->left->balance) {
+            switch (B->left->balance) {
                 case 1: case 0:
                     A = B->left;
                     hama = A->right;
@@ -244,6 +266,16 @@ void turn (struct node **tNode)
                     B->left = hama;
                     *tNode = A;
 
+                    switch (A->balance) {
+                        case 1:
+                            B->balance = 0;
+                            A->balance = 0;
+                            break;
+                        case 0:
+                            B->balance = 1;
+                            A->balance = -1;
+                            break;
+                    }
                     break;
                 case -1:
                     A = B->left;
@@ -256,6 +288,23 @@ void turn (struct node **tNode)
                     B->left = beta;
                     *tNode = C;
 
+                    switch (C->balance) {
+                        case -1:
+                            B->balance = 0;
+                            A->balance = 1;
+                            C->balance = 0;
+                            break;
+                        case 0:
+                            B->balance = 0;
+                            A->balance = 0;
+                            C->balance = 0;
+                            break;
+                        case 1:
+                            B->balance = -1;
+                            A->balance = 0;
+                            C->balance = 0;
+                            break;
+                    }
                     break;
                 default:
                     break;
@@ -265,7 +314,7 @@ void turn (struct node **tNode)
         default:
             break;
     }
-
+/*
     if (B) {
         if (B->left)
             l = B->left->hight;
@@ -301,6 +350,7 @@ void turn (struct node **tNode)
         l = 0;
         r = 0;
     }
+    */
 
     return;
 }

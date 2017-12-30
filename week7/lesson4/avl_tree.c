@@ -25,13 +25,14 @@ struct node *insert (struct tree *in_tree, int element);
 void out_rez (struct node *pNode, int (*array)[COLUMNS], int *num);
 void rm (struct node *rNode);
 void balancer (struct node **bNode);
+void delete_node (struct tree *, int);
 
 int main (void)
 {
     FILE *input = NULL;
     FILE *output = NULL;
     int size = 0;
-    int inUzel = 0;
+    int dUzel = 0;
     int n = 1;
 
     struct tree *avl = init_tree ();
@@ -43,13 +44,13 @@ int main (void)
 
     fscanf (input, "%i", &size);
 
-    int array [size + 1][COLUMNS];
+    int array [size][COLUMNS];
 
     for (int i = 0; i < size; ++i) {
         fscanf (input, "%i %i %i", &array [i][0], &array [i][1], &array [i][2]);
     }
 
-    fscanf (input, "%i", &inUzel);
+    fscanf (input, "%i", &dUzel);
 
     if (fclose (input) != 0) {
         printf ("ERROR of exit from file input.txt\n");
@@ -59,9 +60,13 @@ int main (void)
     if (size) {
         build (&avl->root, 0, array, NULL);
     }
-    insert (avl, inUzel);
-    balancer (&avl->root);
-    out_rez (avl->root, array, &n);
+    delete_node (avl, dUzel);
+    if (avl->root) {
+        balancer (&avl->root);
+        out_rez (avl->root, array, &n);
+    }
+    else
+        n = 0;
 
     if ((output = fopen ("output.txt", "w")) == NULL) {
         printf ("ERROR of open file output.txt\n");
@@ -79,12 +84,65 @@ int main (void)
         exit (EXIT_FAILURE);
     }
 
-    rm (avl->root);
+    if (avl->root)
+        rm (avl->root);
     avl->root = NULL;
     free (avl);
     avl = NULL;
 
     return EXIT_SUCCESS;
+}
+
+void delete_node (struct tree *rm_tree, int element)
+{
+    struct node *rm_node = rm_tree->root;
+    struct node **q = &rm_tree->root;//для изменения адреса в узле
+
+    for (;;) {//поиск удаляемого элемента
+        if (!rm_node)
+            return;
+        else
+            if (rm_node->value == element)
+                break;
+            else
+                if (rm_node->value > element) {
+                    q = &rm_node->left;
+                    rm_node = rm_node->left;
+                }
+                else {
+                    q = &rm_node->right;
+                    rm_node = rm_node->right;
+                }
+    }
+
+    if (!rm_node->left)
+        *q = rm_node->right;
+    else {
+        struct node *y = rm_node->left;
+        
+        if (!y->right) {
+            y->right = rm_node->right;
+            *q = y;
+        }
+        else {
+            struct node *x = y->right;
+
+            while (x->right) {
+                y = x;
+                x = y->right;
+            }
+
+            y->right = x->left;
+            x->left = rm_node->left;
+            x->right = rm_node->right;
+            *q = x;
+        }
+    }
+
+    free (rm_node);
+    rm_node = NULL;
+
+    return;
 }
 
 void balancer (struct node **bNode)

@@ -17,8 +17,9 @@ struct tree {
 };
 
 void inTree (int (*)[], struct node **, int);
-bool proverka_left (struct node*, int);
-bool proverka_right (struct node*, int);
+bool proverka_l (struct node *nNode, int be);
+bool proverka_r (struct node *nNode, int be);
+bool walk (struct node *nNode);
 
 int main (void)
 {
@@ -57,7 +58,7 @@ int main (void)
     }
 
     if (nNodes) {
-        if (proverka_left (bin_tree->root->left, bin_tree->root->value) && proverka_right (bin_tree->root->right, bin_tree->root->value))
+        if (walk (bin_tree->root))
             fprintf (output, "YES");
         else
             fprintf (output, "NO");
@@ -90,71 +91,47 @@ void inTree (int (*array)[COLUMNS], struct node **inNode, int n)
     return;
 }
 
-bool proverka_left (struct node *sNode, int bE)
+bool proverka_l (struct node *nNode, int be)
 {
-    bool rez = false;
+    bool rez = true;
 
-    if (sNode) {
-        if (sNode->value > bE)
-            return false;
-        if (sNode->left) {
-            if (sNode->left->value < sNode->value && sNode->left->value < bE) {
-                rez = proverka_left (sNode->left, bE);
-            }
-            else
-                return false;
-        }
-        else
-            rez = true;
-        if (rez) {
-            if (sNode->right) {
-                if (sNode->right->value > sNode->value && sNode->right->value < bE) {
-                    return proverka_left (sNode->left, bE);
-                }
-                else
-                    return false;
-            }
-            else {
-                return true;
-            }
-        }
-        else
-            return false;
-    }
-    else
-        return true;
+    if (nNode->value >= be)
+        return false;
+    if (nNode->left)
+        rez = proverka_l (nNode->left, be);
+    if (rez && nNode->right)
+        rez = proverka_l (nNode->right, be);
+
+    return rez;
 }
 
-bool proverka_right (struct node *sNode, int bE)
+bool proverka_r (struct node *nNode, int be)
 {
-    bool rez = false;
+    bool rez = true;
 
-    if (sNode) {
-        if (sNode->value < bE)
-            return false;
-        if (sNode->left) {
-            if (sNode->left->value < sNode->value && sNode->left->value > bE) {
-                rez = proverka_right (sNode->left, bE);
-            }
-            else
-                return false;
-        }
-        else
-            rez = true;
-        if (rez) {
-            if (sNode->right) {
-                if (sNode->right->value > sNode->value && sNode->right->value > bE) {
-                    return proverka_right (sNode->right, bE);
-                }
-                else
-                    return false;
-            }
-            else
-                return true;
-        }
-        else
-            return false;
-    }
-    else
-        return true;
+    if (nNode->value <= be)
+        return false;
+    if (nNode->left)
+        rez = proverka_r (nNode->left, be);
+    if (rez && nNode->right)
+        rez = proverka_r (nNode->right, be);
+
+    return rez;
+}
+
+bool walk (struct node *nNode)
+{
+    bool rez = true;
+
+    if (nNode->left)
+        rez = proverka_l (nNode->left, nNode->value);
+    if (rez && nNode->right)
+        rez = proverka_r (nNode->right, nNode->value);
+
+    if (rez && nNode->left)
+        rez = walk (nNode->left);
+    if (rez && nNode->right)
+        rez = walk (nNode->right);
+
+    return rez;
 }

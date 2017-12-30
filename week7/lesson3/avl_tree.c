@@ -17,21 +17,25 @@ struct tree {
 };
 
 struct tree *init_tree (void);
-void build (struct node **inNode, int n, int (*array)[COLUMNS]);
-void rm (struct node *rNode);
+void build (struct node **inNode, int n, int (*array)[COLUMNS], struct node *parent);
 struct node *serch (struct node *sNode, int value);
-void out_rez (struct node *pNode, int (*array)[COLUMNS], int *num);
-void print_nodes (struct node *pNode);
 int highting (struct node *hNode);
 void turn (struct node **tNode);
+struct node *insert (struct tree *in_tree, int element);
+void out_rez (struct node *pNode, int (*array)[COLUMNS], int *num);
+void rm (struct node *rNode);
+void balancer (struct node **bNode);
 
 int main (void)
 {
     FILE *input = NULL;
     FILE *output = NULL;
     int size = 0;
-    struct tree *avl = init_tree ();
+    int inUzel = 0;
     int n = 1;
+    struct node *inNode = NULL;
+
+    struct tree *avl = init_tree ();
 
     if ((input = fopen ("input.txt", "r")) == NULL) {
         printf ("ERROR of open file input.txt\n");
@@ -40,34 +44,35 @@ int main (void)
 
     fscanf (input, "%i", &size);
 
-    int mas [size][COLUMNS];
+    int array [size + 1][COLUMNS];
 
     for (int i = 0; i < size; ++i) {
-        fscanf (input, "%i %i %i", &mas [i][0], &mas [i][1], &mas [i][2]);
+        fscanf (input, "%i %i %i", &array [i][0], &array [i][1], &array [i][2]);
     }
+
+    fscanf (input, "%i", &inUzel);
 
     if (fclose (input) != 0) {
         printf ("ERROR of exit from file input.txt\n");
         exit (EXIT_FAILURE);
     }
 
-    build (&avl->root, 0, mas);
-    highting (avl->root);
-//    print_nodes (avl->root);
-//    printf ("\n");
-    turn (&avl->root);
-//    print_nodes (avl->root);
-//    printf ("\n");
+    if (size) {
+        build (&avl->root, 0, array, NULL);
+    }
+    inNode = insert (avl, inUzel);
+    balancer (&avl->root);
+    out_rez (avl->root, array, &n);
 
     if ((output = fopen ("output.txt", "w")) == NULL) {
         printf ("ERROR of open file output.txt\n");
         exit (EXIT_FAILURE);
     }
 
-    fprintf (output, "%i\n", size);
-    out_rez (avl->root, mas, &n);
+    fprintf (output, "%i\n", n);
+
     for (int i = 0; i < n; ++i) {
-        fprintf (output, "%i %i %i\n", mas [i][0], mas [i][1], mas [i][2]);
+        fprintf (output, "%i %i %i\n", array [i][0], array [i][1], array [i][2]);
     }
 
     if (fclose (output) != 0) {
@@ -83,28 +88,17 @@ int main (void)
     return EXIT_SUCCESS;
 }
 
-struct tree *init_tree (void)
+void balancer (struct node **bNode)
 {
-    struct tree *tree = malloc (sizeof *tree);
-    tree->root = NULL;
+    if ((*bNode)->left)
+        balancer (&(*bNode)->left);
+    if ((*bNode)->right)
+        balancer (&(*bNode)->right);
 
-    return tree;
-}
+    highting (*bNode);
 
-void build (struct node **inNode, int n, int (*array)[COLUMNS])
-{
-    *inNode = malloc (sizeof **inNode);
-    (*inNode)->value = array [n][0];
-    (*inNode)->left = NULL;
-    (*inNode)->right = NULL;
-    (*inNode)->balance = 0;
-
-    if (array [n][1]) {
-        build (&(*inNode)->left, array [n][1] - 1, array);
-    }
-    if (array [n][2]) {
-        build (&(*inNode)->right, array [n][2] - 1, array);
-    }
+    if (abs ((*bNode)->balance) == 2)
+        turn (bNode);
 
     return;
 }
@@ -123,6 +117,66 @@ void rm (struct node *rNode)
     return;
 }
 
+struct tree *init_tree (void)
+{
+    struct tree *tree = malloc (sizeof *tree);
+    tree->root = NULL;
+
+    return tree;
+}
+
+struct node *insert (struct tree *in_tree, int element)
+{
+    struct node *in_node = in_tree->root;
+    struct node **new = &in_tree->root;//нужен для изменения адреса, который содержится в root
+
+    for (;;) {
+        if (!in_node) {
+            in_node = *new = malloc (sizeof *in_node);//выделение памяти под новый узел
+
+            if (in_node) {
+                in_node->value = element;//присваивание значений в новом узле
+                in_node->left = in_node->right = NULL;
+                in_node->balance = 0;
+
+                return in_node;
+            }
+            else
+                return NULL;//если что-то пошло не так
+        }
+        else
+            if (in_node->value == element)//на случай, если проверка не была проведена
+                return NULL;
+            else
+                if (in_node->value > element) {//нахождение нужного места для вставки
+                    new = &in_node->left;
+                    in_node = in_node->left;
+                }
+                else {
+                    new = &in_node->right;
+                    in_node = in_node->right;
+                }
+    }
+}
+
+void build (struct node **inNode, int n, int (*array)[COLUMNS], struct node *parent)
+{
+    *inNode = malloc (sizeof **inNode);
+    (*inNode)->value = array [n][0];
+    (*inNode)->left = NULL;
+    (*inNode)->right = NULL;
+    (*inNode)->balance = 0;
+
+    if (array [n][1]) {
+        build (&(*inNode)->left, array [n][1] - 1, array, (*inNode));
+    }
+    if (array [n][2]) {
+        build (&(*inNode)->right, array [n][2] - 1, array, (*inNode));
+    }
+
+    return;
+}
+
 struct node *serch (struct node *sNode, int value)
 {
     while (value != sNode->value) {
@@ -136,42 +190,6 @@ struct node *serch (struct node *sNode, int value)
     }
 
     return sNode;
-}
-
-void out_rez (struct node *pNode, int (*array)[COLUMNS], int *num)
-{
-    int string = *num - 1;
-
-    array [string][0] = pNode->value;
-
-    if (pNode->right) {
-        array [string][2] = ++(*num);
-        out_rez (pNode->right, array, num);
-    }
-    else
-        array [string][2] = 0;
-
-    if (pNode->left) {
-        array [string][1] = ++(*num);
-        out_rez (pNode->left, array, num);
-    }
-    else
-        array [string][1] = 0;
-
-    return;
-}
-
-void print_nodes (struct node *pNode)
-{
-    if (pNode->left)
-        print_nodes (pNode->left);
-
-    printf ("(%i %i) ", pNode->value, pNode->balance);
-
-    if (pNode->right)
-        print_nodes (pNode->right);
-
-    return;
 }
 
 int highting (struct node *hNode)
@@ -202,7 +220,7 @@ void turn (struct node **tNode)
 
     B = *tNode;
 
-    switch ((*tNode)->balance) {
+    switch (B->balance) {
         case -2:
             switch (B->right->balance) {
                 case -1: case 0:
@@ -314,6 +332,29 @@ void turn (struct node **tNode)
         default:
             break;
     }
+
+    return;
+}
+
+void out_rez (struct node *pNode, int (*array)[COLUMNS], int *num)
+{
+    int string = *num - 1;
+
+    array [string][0] = pNode->value;
+
+    if (pNode->right) {
+        array [string][2] = ++(*num);
+        out_rez (pNode->right, array, num);
+    }
+    else
+        array [string][2] = 0;
+
+    if (pNode->left) {
+        array [string][1] = ++(*num);
+        out_rez (pNode->left, array, num);
+    }
+    else
+        array [string][1] = 0;
 
     return;
 }

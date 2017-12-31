@@ -4,9 +4,8 @@
 #include <stdlib.h>
 
 struct node {
-    struct node *left;
-    struct node *right;
-    int value;
+    struct node *child [2];
+    int info;
     int balance;
 };
 
@@ -16,10 +15,14 @@ struct tree {
 };
 
 struct tree *init_tree (void);
-struct node *serch (struct node *sNode, const int value);
-void turn (struct node **tNode);
+struct node *new_node (struct tree *, int);
+struct node *serch (struct node *, const int);
+void turn (struct node **);
+struct node *insert (struct tree *, int);
 struct node *del (struct node *);
 struct tree *del_tree (struct tree *);
+int rm (struct tree *, int);
+void print_n (struct node *);
 
 int main (void)
 {
@@ -27,9 +30,12 @@ int main (void)
     FILE *output = NULL;
     int size = 0;
     int value = 0;
-    struct node **hNode = NULL;
 
     struct tree *avl = init_tree ();
+    if (!avl) {
+        printf ("Error of memory\n");
+        exit (EXIT_FAILURE);
+    }
 
     if ((input = fopen ("input.txt", "r")) == NULL) {
         printf ("ERROR of open file input.txt\n");
@@ -50,10 +56,16 @@ int main (void)
         switch (getc (input)) {
             case 'A':
                 fscanf (input, "%i", &value);
-                fprintf (output, "%i\n", avl->root->balance);
+                insert (avl, value);
+                fprintf (output, "%i\n", - avl->root->balance);
                 break;
             case 'D':
                 fscanf (input, "%i", &value);
+                rm (avl, value);
+                if (avl->root)
+                    fprintf (output, "%i\n", - avl->root->balance);
+                else
+                    fprintf (output, "%i\n", 0);
                 break;
             case 'C':
                 fscanf (input, "%i", &value);
@@ -76,9 +88,24 @@ int main (void)
         exit (EXIT_FAILURE);
     }
 
+//    printf ("%i\n", avl->root->info);
+//    print_n (avl->root);
+//    printf ("\n");
+
     avl = del_tree (avl);
 
     return EXIT_SUCCESS;
+}
+
+void print_n (struct node *pNode)
+{
+    if (pNode->child [0])
+        print_n (pNode->child [0]);
+
+    printf ("(%i %i)", pNode->info, pNode->balance);
+
+    if (pNode->child [1])
+        print_n (pNode->child [1]);
 }
 
 struct tree *init_tree (void)
@@ -90,13 +117,152 @@ struct tree *init_tree (void)
     return tree;
 }
 
+struct node *new_node (struct tree *n_tree, int item)
+{
+    struct node *new = malloc (sizeof *new);
+    if (new) {
+        new->child [0] = new->child [1] = NULL;
+        new->info = item;
+        new->balance = 0;
+        n_tree->size++;
+    }
+
+    return new;
+}
+
+struct node *insert (struct tree *in_tree, int element)
+{
+    struct node *in_node = in_tree->root;
+    struct node **new = &in_tree->root;
+
+    struct node **array [32] = {};
+    int dirs [32] = {};
+    int count = 0;
+
+    for (;;) {
+        if (!in_node) {
+            in_node = *new = new_node (in_tree, element);
+            break;
+        }
+        else
+            if (in_node->info == element)
+                return NULL;
+            else {
+                array [count] = new;
+                dirs [count] = element > in_node->info;
+                new = &in_node->child [dirs [count]];
+                in_node = in_node->child [dirs [count]];
+                count++;
+            }
+    }
+
+    if (in_node && count) {
+        for (int i = count - 1; i >= 0; --i) {
+            if ((*array [i])->balance) {
+                (*array [i])->balance = (dirs [i]) ? (*array [i])->balance - 1 : (*array [i])->balance + 1;
+                if (abs ((*array [i])->balance) == 2)
+                    turn (array [i]);
+                if (!(*array [i])->balance)
+                    break;
+            }
+            else
+                (*array [i])->balance = (dirs [i]) ? -1 : 1;
+        }
+    }
+
+    return in_node;
+}
+
+int rm (struct tree *rm_tree, int element)
+{
+    struct node *rm_node = rm_tree->root;
+    struct node **q = &rm_tree->root;
+
+    struct node **array [32] = {};
+    int dirs [32] = {};
+    int count = 0;
+
+    for (;;) {
+        if (!rm_node)
+            return 1;
+        else
+            if (rm_node->info == element)
+                break;
+            else {
+                array [count] = q;
+                dirs [count] = element > rm_node->info;
+                q = &rm_node->child [dirs [count]];
+                rm_node = rm_node->child [dirs [count]];
+                count++;
+            }
+    }
+
+    if (!rm_node->child [0]) {
+        *q = rm_node->child [1];
+    }
+    else {
+        struct node *y = rm_node->child [0];
+        
+        dirs [count] = 0;
+        array [count] = q;
+        count++;
+
+        if (!y->child [1]) {
+            y->child [1] = rm_node->child [1];
+
+            y->balance = rm_node->balance;
+            *q = y;
+        }
+        else {
+            struct node *x = y->child [1];
+            dirs [count] = 1;
+            array [count] = &rm_node->child [0];
+            count++;
+
+            while (x->child [1]) {
+                dirs [count] = 1;
+                array [count] = &y->child [1];
+                count++;
+
+                y = x;
+                x = x->child [1];
+            }
+
+            y->child [1] = x->child [0];
+            x->child [0] = rm_node->child [0];
+            x->child [1] = rm_node->child [1];
+
+            x->balance = rm_node->balance;
+
+            *q = x;
+        }
+    }
+
+    for (int i = count - 1; i >= 0; --i) {
+        if ((*array [i])->balance) {
+            (*array [i])->balance = (dirs [i]) ? (*array [i])->balance + 1 : (*array [i])->balance - 1;
+            if (abs ((*array [i])->balance) == 2)
+                turn (array [i]);
+        }
+        else {
+            (*array [i])->balance = (dirs [i]) ? 1 : -1;
+            if ((*array [i])->balance)
+                break;
+        }
+    }
+
+    rm_tree->size--;
+
+    free (rm_node);
+    rm_node = NULL;
+
+    return 0;
+}
+
 struct node *serch (struct node *sNode, const int value)
 {
-    while (value != sNode->value) {
-        if (value > sNode->value)
-            sNode = sNode->right;
-        else
-            sNode = sNode->left;
+    while (value != sNode->info) {
+        sNode = sNode->child [value > sNode->info];
 
         if (!sNode)
             break;
@@ -117,8 +283,9 @@ struct tree *del_tree (struct tree *rTree)
 
 struct node *del (struct node *rNode)
 {
-    rNode->left = (rNode->left) ? del (rNode->left) : NULL;
-    rNode->right = (rNode->right) ? del (rNode->right) : NULL;
+    for (int i = 0; i < 2; ++i) {
+        rNode->child [i] = (rNode->child [i]) ? del (rNode->child [i]) : NULL;
+    }
 
     free (rNode);
 
@@ -135,114 +302,56 @@ void turn (struct node **tNode)
 
     B = *tNode;
 
-    switch (B->balance) {
-        case -2:
-            switch (B->right->balance) {
-                case -1: case 0:
-                    A = B->right;
-                    hama = A->left;
-                    A->left = B;
-                    B->right = hama;
-                    *tNode = A;
+    int dir = (B->balance < 0);
+    int mod = (dir) ? 1: -1;
 
-                    switch (A->balance) {
-                        case -1:
-                            B->balance = 0;
-                            A->balance = 0;
-                            break;
-                        case 0:
-                            B->balance = -1;
-                            A->balance = 1;
-                            break;
-                    }
+    switch (B->child [dir]->balance * mod) {
+        case -1: case 0:
+            A = B->child [dir];
+            hama = A->child [!dir];
+            A->child [!dir] = B;
+            B->child [dir] = hama;
+            *tNode = A;
+
+            switch (A->balance * mod) {
+                case -1:
+                    B->balance = 0;
+                    A->balance = 0;
+                    break;
+                case 0:
+                    B->balance = -1 * mod;
+                    A->balance = 1 * mod;
+                    break;
+            }
+            break;
+        case 1:
+            A = B->child [dir];
+            C = A->child [!dir];
+            beta = C->child [!dir];
+            hama = C->child [dir];
+            C->child [dir]= A;
+            C->child [!dir]= B;
+            A->child [!dir]= hama;
+            B->child [dir]= beta;
+            *tNode = C;
+
+            switch (C->balance * mod) {
+                case -1:
+                    B->balance = 1 * mod;
+                    A->balance = 0;
+                    C->balance = 0;
+                    break;
+                case 0:
+                    B->balance = 0;
+                    A->balance = 0;
+                    C->balance = 0;
                     break;
                 case 1:
-                    A = B->right;
-                    C = A->left;
-                    beta = C->left;
-                    hama = C->right;
-                    C->right = A;
-                    C->left = B;
-                    A->left = hama;
-                    B->right = beta;
-                    *tNode = C;
-
-                    switch (C->balance) {
-                        case -1:
-                            B->balance = 1;
-                            A->balance = 0;
-                            C->balance = 0;
-                            break;
-                        case 0:
-                            B->balance = 0;
-                            A->balance = 0;
-                            C->balance = 0;
-                            break;
-                        case 1:
-                            B->balance = 0;
-                            A->balance = -1;
-                            C->balance = 0;
-                            break;
-                    }
-                    break;
-                default:
+                    B->balance = 0;
+                    A->balance = -1 * mod;
+                    C->balance = 0;
                     break;
             }
-
-            break;
-        case 2:
-            switch (B->left->balance) {
-                case 1: case 0:
-                    A = B->left;
-                    hama = A->right;
-                    A->right = B;
-                    B->left = hama;
-                    *tNode = A;
-
-                    switch (A->balance) {
-                        case 1:
-                            B->balance = 0;
-                            A->balance = 0;
-                            break;
-                        case 0:
-                            B->balance = 1;
-                            A->balance = -1;
-                            break;
-                    }
-                    break;
-                case -1:
-                    A = B->left;
-                    C = A->right;
-                    beta = C->right;
-                    hama = C->left;
-                    C->left = A;
-                    C->right = B;
-                    A->right = hama;
-                    B->left = beta;
-                    *tNode = C;
-
-                    switch (C->balance) {
-                        case -1:
-                            B->balance = 0;
-                            A->balance = 1;
-                            C->balance = 0;
-                            break;
-                        case 0:
-                            B->balance = 0;
-                            A->balance = 0;
-                            C->balance = 0;
-                            break;
-                        case 1:
-                            B->balance = -1;
-                            A->balance = 0;
-                            C->balance = 0;
-                            break;
-                    }
-                    break;
-                default:
-                    break;
-            }
-
             break;
         default:
             break;

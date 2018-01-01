@@ -22,7 +22,6 @@ struct node *insert (struct tree *, int);
 struct node *del (struct node *);
 struct tree *del_tree (struct tree *);
 int rm (struct tree *, int);
-void print_n (struct node *);
 
 int main (void)
 {
@@ -88,24 +87,9 @@ int main (void)
         exit (EXIT_FAILURE);
     }
 
-//    printf ("%i\n", avl->root->info);
-//    print_n (avl->root);
-//    printf ("\n");
-
     avl = del_tree (avl);
 
     return EXIT_SUCCESS;
-}
-
-void print_n (struct node *pNode)
-{
-    if (pNode->child [0])
-        print_n (pNode->child [0]);
-
-    printf ("(%i %i)", pNode->info, pNode->balance);
-
-    if (pNode->child [1])
-        print_n (pNode->child [1]);
 }
 
 struct tree *init_tree (void)
@@ -215,8 +199,10 @@ int rm (struct tree *rm_tree, int element)
         }
         else {
             struct node *x = y->child [1];
+            int px = 0;
+            px = count;
             dirs [count] = 1;
-            array [count] = &rm_node->child [0];
+//            array [count] = &x->child [0];//та самая ошибка, где было rm_node->
             count++;
 
             while (x->child [1]) {
@@ -232,6 +218,8 @@ int rm (struct tree *rm_tree, int element)
             x->child [0] = rm_node->child [0];
             x->child [1] = rm_node->child [1];
 
+            array [px] = &x->child [0];
+
             x->balance = rm_node->balance;
 
             *q = x;
@@ -244,11 +232,11 @@ int rm (struct tree *rm_tree, int element)
             if (abs ((*array [i])->balance) == 2)
                 turn (array [i]);
         }
-        else {
+        else
             (*array [i])->balance = (dirs [i]) ? 1 : -1;
-            if ((*array [i])->balance)
-                break;
-        }
+
+        if ((*array [i])->balance)//вторая ошибка была в отсутствии этого условия
+            break;
     }
 
     rm_tree->size--;

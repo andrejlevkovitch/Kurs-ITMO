@@ -72,7 +72,7 @@ andrejlevkovitch@gmail.com
             ready for C
     week8
         task1
-            
+            ready for C
         task2
             
         task3

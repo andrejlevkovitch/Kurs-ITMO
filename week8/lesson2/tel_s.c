@@ -4,23 +4,25 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define M 9887
+#define M 1
 #define DEF "put"
 
-#define GET 9
-#define PREV 3
-#define NEXT 2
-#define PUT 0
-#define DEL 12
+#define GET "get"
+#define PREV "prev"
+#define NEXT "next"
+#define PUT "put"
+#define DEL "delete"
 
 #define MAX_V 21
 
 struct node {
     char *key;
     char *info;
-    struct node *ord [2];
 
+    struct node *ord [2];
     struct node *child [2];
+
+    short balance;
 };
 
 short hashing (char *);
@@ -28,6 +30,7 @@ struct node *add (struct node **, char *, char *, struct node *);
 struct node *search (struct node *, char *);
 struct node *cler (struct node *);
 void rm (struct node **, char *);
+struct node *new_node (struct node *last, char *key, char *item);
 
 int main (void)
 {
@@ -55,39 +58,34 @@ int main (void)
 
     for (int i = 0; i < size; ++i) {
         fscanf (input, "%s", operace);
-        switch (strcmp (DEF, operace)) {
-            case GET:
-                fscanf (input, "%s", key);
-                if ((h_node = search (directory [hashing (key)], key)))
-                    fprintf (output, "%s\n", h_node->info);
-                else
-                    fprintf (output, "%s\n", "<none>");
-              break;
-            case PREV:
-                fscanf (input, "%s", key);
-                if ((h_node = search (directory [hashing (key)], key)) && h_node->ord [0])
-                    fprintf (output, "%s\n", h_node->ord [0]->info);
-                else
-                    fprintf (output, "%s\n", "<none>");
-                break;
-            case NEXT:
-                fscanf (input, "%s", key);
-                if ((h_node = search (directory [hashing (key)], key)) && h_node->ord [1])
-                    fprintf (output, "%s\n", h_node->ord [1]->info);
-                else
-                    fprintf (output, "%s\n", "<none>");
-                break;
-            case PUT:
-                fscanf (input, "%s %s", key, value);
-                last = add (&directory [hashing (key)], key, value, last);
-                break;
-            case DEL:
-                fscanf (input, "%s", key);
-                rm (&directory [hashing (key)], key);
-                break;
-//          default:
-//              fprintf (output, "!");
-//              break;
+        if (!strcmp (GET, operace)) {
+            fscanf (input, "%s", key);
+            if ((h_node = search (directory [hashing (key)], key)))
+                fprintf (output, "%s\n", h_node->info);
+            else
+                fprintf (output, "%s\n", "<none>");
+        }
+        else if (!strcmp (PREV, operace)) {
+            fscanf (input, "%s", key);
+            if ((h_node = search (directory [hashing (key)], key)) && h_node->ord [0])
+                fprintf (output, "%s\n", h_node->ord [0]->info);
+            else
+                fprintf (output, "%s\n", "<none>");
+        }
+        else if (!strcmp (NEXT, operace)) {
+            fscanf (input, "%s", key);
+            if ((h_node = search (directory [hashing (key)], key)) && h_node->ord [1])
+                fprintf (output, "%s\n", h_node->ord [1]->info);
+            else
+                fprintf (output, "%s\n", "<none>");
+        }
+        else if (!strcmp (PUT, operace)) {
+            fscanf (input, "%s %s", key, value);
+            last = add (&directory [hashing (key)], key, value, last);
+        }
+        else if (!strcmp (DEL, operace)) {
+            fscanf (input, "%s", key);
+            rm (&directory [hashing (key)], key);
         }
     }
 
@@ -124,6 +122,29 @@ short hashing (char *key)
     return rez;
 }
 
+struct node *new_node (struct node *last, char *key, char *item)
+{
+    struct node *new = malloc (sizeof *new);
+    if (new) {
+        new->child [0] = new->child [1] = NULL;
+
+        new->info = malloc (strlen (item) + 1);
+        strcpy (new->info, item);
+        new->key = malloc (strlen (key) + 1);
+        strcpy (new->key, key);
+
+        new->ord [0] = last;
+        if (last)
+            last->ord [1] = new;
+        new->ord [1] = NULL;
+
+        new->balance = 0;
+
+    }
+
+    return new;
+}
+
 struct node *add (struct node **a_el, char *key, char *in, struct node *last)
 {
     struct node *in_node = *a_el;
@@ -132,23 +153,9 @@ struct node *add (struct node **a_el, char *key, char *in, struct node *last)
 
     for (;;) {
         if (!in_node) {
-            in_node = *a_el = malloc (sizeof *in_node);//выделение памяти под новый узел
-
-            if (in_node) {
-                in_node->key = malloc (strlen (key) + 1);
-                strcpy (in_node->key, key);
-                in_node->info = malloc (strlen (in) + 1);
-                strcpy (in_node->info, in);
-                in_node->child [0] = in_node->child [1] = NULL;
-                in_node->ord [0] = last;
-                if (last)
-                    last->ord [1] = in_node;
-                in_node->ord [1] = NULL;
-
+            in_node = *a_el = new_node (last, key, in);
+            if (in_node)
                 return in_node;
-            }
-            else
-                return NULL;//если что-то пошло не так
         }
         else
             if (!(op = strcmp (in_node->key ,key))) {
@@ -205,7 +212,7 @@ void rm (struct node **rm_tree, char *element)
         struct node *y = rm_node->child [1];//подветка основной ветки
         
         if (!y->child [0]) {//если левая подветка пуста
-            y->child [1] = rm_node->child [0];//то левая ветка переносится в левую подветку
+            y->child [0] = rm_node->child [0];//то левая ветка переносится в левую подветку
             *q = y;//а узел правого потомка смещается на место родителя
         }
         else {//если левая подветка заполнена
@@ -223,6 +230,8 @@ void rm (struct node **rm_tree, char *element)
         }
     }
 
+    free (rm_node->key);
+    free (rm_node->info);
     free (rm_node);//это значение больше нигде не используется, так что освобождаем его
     rm_node = NULL;
 

@@ -101,10 +101,11 @@ void restoring (int array [], int pile [], int bunch [], int num)
         bunch [pile [num]] = num;
         bunch [pile [leas]] = leas;
 
-/*        temp = bunch [pile [num]];//а можно записать и так, но учтите, что в этом случае, нужно чтобы строка 56 была обязательно раскомментирована!!!!!!
+        /*temp = bunch [pile [num]];//а можно записать и так, но учтите, что в этом случае, нужно чтобы строка 56 была обязательно раскомментирована!!!!!!
         bunch [pile [num]] = bunch [pile [leas]];
         bunch [pile [leas]] = temp;
-*/
+        */
+
         restoring (array, pile, bunch, leas);//рекурсия до 0-вого элемента
     }
 

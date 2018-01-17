@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
+#include <limits.h>
 
 #define COLUMNS 3
 
@@ -17,9 +17,8 @@ struct tree {
 };
 
 void inTree (int (*)[], struct node **, int);
-bool proverka_l (struct node *nNode, int be);
-bool proverka_r (struct node *nNode, int be);
-bool walk (struct node *nNode);
+int test (struct node *, long long, long long);
+int walk (struct node *);
 
 int main (void)
 {
@@ -91,47 +90,23 @@ void inTree (int (*array)[COLUMNS], struct node **inNode, int n)
     return;
 }
 
-bool proverka_l (struct node *nNode, int be)
+int test (struct node *tNode,  long long min,  long long max)
 {
-    bool rez = true;
-
-    if (nNode->value >= be)
-        return false;
-    if (nNode->left)
-        rez = proverka_l (nNode->left, be);
-    if (rez && nNode->right)
-        rez = proverka_l (nNode->right, be);
-
-    return rez;
+    if (!tNode)
+        return 1;
+    else {
+        if (tNode->value < max && tNode->value > min) {
+            return (test (tNode->right, tNode->value, max)) ? test (tNode->left, min, tNode->value) : 0;
+        }
+        else
+            return 0;
+    }
 }
 
-bool proverka_r (struct node *nNode, int be)
+int walk (struct node *tNode)
 {
-    bool rez = true;
-
-    if (nNode->value <= be)
-        return false;
-    if (nNode->left)
-        rez = proverka_r (nNode->left, be);
-    if (rez && nNode->right)
-        rez = proverka_r (nNode->right, be);
-
-    return rez;
-}
-
-bool walk (struct node *nNode)
-{
-    bool rez = true;
-
-    if (nNode->left)
-        rez = proverka_l (nNode->left, nNode->value);
-    if (rez && nNode->right)
-        rez = proverka_r (nNode->right, nNode->value);
-
-    if (rez && nNode->left)
-        rez = walk (nNode->left);
-    if (rez && nNode->right)
-        rez = walk (nNode->right);
-
-    return rez;
+    if (test (tNode->left, LLONG_MIN, tNode->value) && test (tNode->right, tNode->value, LLONG_MAX))
+        return 1;
+    else
+        return 0;
 }

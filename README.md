@@ -58,7 +58,7 @@ andrejlevkovitch@gmail.com
         task4
             ready for C
         task5
-            in progress
+            ready for C
     week7
         task1
             ready for C
@@ -76,7 +76,7 @@ andrejlevkovitch@gmail.com
         task2
             ready for C
         task3
-            
+            ready for C
         task4
             
     week9
